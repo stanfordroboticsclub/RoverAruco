@@ -55,7 +55,7 @@ markers.append( [[1,1,0,1,1], [1,1,0,1,1], [1,0,1,0,1], [0,1,1,0,0], [1,0,1,1,1]
 
 #add two wide border (vs one wide border? why?)
 markers = add_black_border(markers)
-markers = add_black_border(markers)
+# markers = add_black_border(markers)
 
 
 # for marker in markers:
