@@ -2,9 +2,9 @@ import numpy as np
 import cv2
 import cv2.aruco
 
-def get_Dictionary(markers):
+def get_Dictionary(markers_list):
     # https://datigrezzi.com/2019/07/12/custom-aruco-markers-in-python/
-    markers = np.array(markers, dtype=np.uint8)
+    markers = np.array(markers_list, dtype=np.uint8)
     number = markers.shape[0]
     side = markers.shape[1]
     assert side == markers.shape[2]
@@ -17,7 +17,27 @@ def get_Dictionary(markers):
     for i,data in enumerate(markers):
         aruco_dict.bytesList[i] = cv2.aruco.Dictionary_getByteListFromBits(data)
 
+    aruco_dict.maxCorrectionBits = markers_min_distance(markers_list)
+
     return aruco_dict
+
+def markers_min_distance(markers):
+    distances = []
+    for m1 in markers:
+        for m2 in markers:
+            m1 = np.array(m1)
+            m2 = np.array(m2)
+            if((m1 == m2).all()):
+                continue
+            distances.append( np.sum(m1^m2) )
+    # cast to int is required. np.int64 can mess stuff up
+    return int(min(distances))
+
+def print_markers(markers):
+    for marker in markers:
+        for row in marker:
+            print(row)
+        print()
 
 def add_black_border(markers):
     out = []
@@ -57,11 +77,6 @@ markers.append( [[1,1,0,1,1], [1,1,0,1,1], [1,0,1,0,1], [0,1,1,0,0], [1,0,1,1,1]
 markers = add_black_border(markers)
 # markers = add_black_border(markers)
 
-
-# for marker in markers:
-#     for row in marker:
-#         print(row)
-#     print()
 
 dictionary = get_Dictionary(markers)
 
