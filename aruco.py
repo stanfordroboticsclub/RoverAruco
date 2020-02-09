@@ -19,6 +19,18 @@ def get_Dictionary(markers):
 
     return aruco_dict
 
+def add_black_border(markers):
+    out = []
+    size = len(markers[0][0])
+    for marker in markers:
+        assert len(marker[0]) == size
+        new_marker = []
+        new_marker.append( [0]*(size +2) )
+        new_marker.extend(  [ [0] + row + [0] for row in marker] )
+        new_marker.append( [0]*(size +2) )
+        out.append(new_marker)
+    return out
+
 markers = []
 #post legs:
 markers.append( [[1,1,0,1,1], [1,1,0,1,1], [1,0,1,0,1], [1,1,1,1,1], [1,1,1,1,1]] )
@@ -41,7 +53,19 @@ markers.append( [[1,1,0,1,1], [1,1,0,1,1], [1,0,1,0,1], [0,0,1,0,1], [1,1,1,1,0]
 markers.append( [[1,1,0,1,1], [1,1,0,1,1], [1,0,1,0,1], [1,1,1,0,0], [1,1,1,0,0]] )
 markers.append( [[1,1,0,1,1], [1,1,0,1,1], [1,0,1,0,1], [0,1,1,0,0], [1,0,1,1,1]] )
 
+#add two wide border (vs one wide border? why?)
+markers = add_black_border(markers)
+markers = add_black_border(markers)
+
+
+# for marker in markers:
+#     for row in marker:
+#         print(row)
+#     print()
+
 dictionary = get_Dictionary(markers)
+
+# tags used by urc not in standard dictionary
 # dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_1000)
 
 def main():
