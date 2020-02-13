@@ -82,6 +82,51 @@ dictionary = get_Dictionary(markers)
 
 # tags used by urc not in standard dictionary
 # dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_1000)
+dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
+
+
+mtx = None
+dist = None
+
+# isight
+# dist =  np.array([[ 9.10040511e-01],
+#        [ 1.09754967e+01],
+#        [-4.87192834e-03],
+#        [-1.85610734e-02],
+#        [ 3.96624729e+01],
+#        [ 1.49320854e+00],
+#        [ 8.84809151e+00],
+#        [ 4.57254128e+01],
+#        [ 0.00000000e+00],
+#        [ 0.00000000e+00],
+#        [ 0.00000000e+00],
+#        [ 0.00000000e+00],
+#        [ 0.00000000e+00],
+#        [ 0.00000000e+00]])
+
+# mtx =  np.array([[1.08479191e+03, 0.00000000e+00, 3.56409835e+02],
+#        [0.00000000e+00, 1.08479191e+03, 3.45422188e+02],
+#        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+
+#c920
+
+dist =  np.array([[ 2.68013365e+00],
+       [ 4.45921553e+01],
+       [-1.66943228e-02],
+       [-1.41329716e-02],
+       [-2.14441609e+02],
+       [ 2.64990348e+00],
+       [ 4.34424237e+01],
+       [-2.10288217e+02],
+       [ 0.00000000e+00],
+       [ 0.00000000e+00],
+       [ 0.00000000e+00],
+       [ 0.00000000e+00],
+       [ 0.00000000e+00],
+       [ 0.00000000e+00]])
+mtx =  np.array([[671.14819063,   0.        , 348.3507712 ],
+       [  0.        , 671.14819063, 204.40567262],
+       [  0.        ,   0.        ,   1.        ]])
 
 def main():
     cap = cv2.VideoCapture(0)
@@ -90,12 +135,21 @@ def main():
         # Capture frame-by-frame
         ret, frame = cap.read()
 
-        # Our operations on the frame come here
-        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
         # Display the resulting frame
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(frame, dictionary)
         image = cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+
+        if mtx is not None:
+            size_of_marker =  0.025 # side lenght of the marker in meter
+            rvecs,tvecs, _objPoints = cv2.aruco.estimatePoseSingleMarkers(corners, size_of_marker , mtx, dist)
+
+            if tvecs is not None:
+                length_of_axis = 0.1
+                for i in range(len(tvecs)):
+                    image = cv2.aruco.drawAxis(image, mtx, dist, rvecs[i], tvecs[i], length_of_axis)
+                print('rotation', rvecs[0])
+                print('translation', tvecs[0])
+
         cv2.imshow('frame', image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
