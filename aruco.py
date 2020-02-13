@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import cv2.aruco
 
+import math
+
 def get_Dictionary(markers_list):
     # https://datigrezzi.com/2019/07/12/custom-aruco-markers-in-python/
     markers = np.array(markers_list, dtype=np.uint8)
@@ -82,7 +84,7 @@ dictionary = get_Dictionary(markers)
 
 # tags used by urc not in standard dictionary
 # dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_1000)
-dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
+# dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
 
 
 mtx = None
@@ -108,8 +110,8 @@ dist = None
 #        [0.00000000e+00, 1.08479191e+03, 3.45422188e+02],
 #        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
 
-#c920
 
+#c920
 dist =  np.array([[ 2.68013365e+00],
        [ 4.45921553e+01],
        [-1.66943228e-02],
@@ -147,8 +149,18 @@ def main():
                 length_of_axis = 0.1
                 for i in range(len(tvecs)):
                     image = cv2.aruco.drawAxis(image, mtx, dist, rvecs[i], tvecs[i], length_of_axis)
-                print('rotation', rvecs[0])
-                print('translation', tvecs[0])
+
+                for translation, _id in zip(tvecs, ids):
+
+                    x,y,z = translation[0,:]
+                    print(x,y,z)
+
+                    angle = math.degrees(math.atan2(x,z))
+                    distance = math.sqrt( x**2 + z**2)
+                    out = {"id": _id[0], "dist": distance, "angle":angle}
+                    print(out)
+
+                print()
 
         cv2.imshow('frame', image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
