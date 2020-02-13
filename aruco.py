@@ -4,6 +4,8 @@ import cv2.aruco
 
 import math
 
+from UDPComms import Publisher
+
 def get_Dictionary(markers_list):
     # https://datigrezzi.com/2019/07/12/custom-aruco-markers-in-python/
     markers = np.array(markers_list, dtype=np.uint8)
@@ -130,6 +132,12 @@ mtx =  np.array([[671.14819063,   0.        , 348.3507712 ],
        [  0.        , 671.14819063, 204.40567262],
        [  0.        ,   0.        ,   1.        ]])
 
+
+from CameraStream import Server
+s = Server(Server.INPUT.OPENCV)
+
+pub = Publisher(8390)
+
 def main():
     cap = cv2.VideoCapture(0)
 
@@ -142,9 +150,11 @@ def main():
         image = cv2.aruco.drawDetectedMarkers(frame, corners, ids)
 
         if mtx is not None:
-            size_of_marker =  0.025 # side lenght of the marker in meter
+            # size_of_marker =  0.025 # side lenght of the marker in meter
+            size_of_marker =  0.200 # side lenght of the marker in meter
             rvecs,tvecs, _objPoints = cv2.aruco.estimatePoseSingleMarkers(corners, size_of_marker , mtx, dist)
 
+            msg = []
             if tvecs is not None:
                 length_of_axis = 0.1
                 for i in range(len(tvecs)):
@@ -157,18 +167,20 @@ def main():
 
                     angle = math.degrees(math.atan2(x,z))
                     distance = math.sqrt( x**2 + z**2)
-                    out = {"id": _id[0], "dist": distance, "angle":angle}
-                    print(out)
-
+                    point = {"id": _id[0], "dist": distance, "angle":angle}
+                    msg.append(point)
+                    print(point)
                 print()
 
-        cv2.imshow('frame', image)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            pub.send(msg)
 
-    # When everything done, release the capture
-    cap.release()
-    cv2.destroyAllWindows()
+        s.imshow('frame', image)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
+    # # When everything done, release the capture
+    # cap.release()
+    # cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()
