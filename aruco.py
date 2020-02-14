@@ -167,7 +167,7 @@ def main():
 
                     angle = math.degrees(math.atan2(x,z))
                     distance = math.sqrt( x**2 + z**2)
-                    point = {"id": _id[0], "dist": distance, "angle":angle}
+                    point = {"id": int(_id[0]), "dist": float(distance), "angle":float(angle) }
                     msg.append(point)
                     print(point)
                 print()
