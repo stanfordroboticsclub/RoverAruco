@@ -184,7 +184,7 @@ def main():
                     x,y,z = translation[0,:]
                     print(x,y,z)
 
-                    angle = math.degrees(math.atan2(x,z))
+                    angle = -math.degrees(math.atan2(x,z))
                     distance = math.sqrt( x**2 + z**2)
                     point = {"id": int(_id[0]), "dist": float(distance), "angle":float(angle) }
                     msg.append(point)
