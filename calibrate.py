@@ -115,7 +115,7 @@ def mark_axis(image, mtx, dist):
 
 
 if __name__ == "__main__":
-    datadir = "./c920/"
+    datadir = "./c930/"
     images = np.array([datadir + f for f in os.listdir(datadir) if f.endswith(".jpg") ])
 
     allCorners,allIds,imsize=read_chessboards(images)
